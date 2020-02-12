@@ -47,6 +47,7 @@ C.rot_90 = False
 
 img_path = options.test_path
 
+
 def format_img_size(img, C):
 	""" formats the image size based on config """
 	img_min_side = float(C.im_size)
@@ -63,6 +64,7 @@ def format_img_size(img, C):
 	img = cv2.resize(img, (new_width, new_height), interpolation=cv2.INTER_CUBIC)
 	return img, ratio	
 
+
 def format_img_channels(img, C):
 	""" formats the image channels based on config """
 	img = img[:, :, (2, 1, 0)]
@@ -75,11 +77,13 @@ def format_img_channels(img, C):
 	img = np.expand_dims(img, axis=0)
 	return img
 
+
 def format_img(img, C):
 	""" formats an image for model prediction based on config """
 	img, ratio = format_img_size(img, C)
 	img = format_img_channels(img, C)
 	return img, ratio
+
 
 # Method to transform the coordinates of the bounding box to its original size
 def get_real_coordinates(ratio, x1, y1, x2, y2):
@@ -89,7 +93,9 @@ def get_real_coordinates(ratio, x1, y1, x2, y2):
 	real_x2 = int(round(x2 // ratio))
 	real_y2 = int(round(y2 // ratio))
 
-	return (real_x1, real_y1, real_x2 ,real_y2)
+	print("Testing real bounding box co-ords", real_x1, real_y1, real_x2, real_y2)
+	return real_x1, real_y1, real_x2, real_y2
+
 
 class_mapping = C.class_mapping
 
@@ -191,12 +197,13 @@ for idx, img_name in enumerate(sorted(os.listdir(img_path))):
 
 		[P_cls, P_regr] = model_classifier_only.predict([F, ROIs])
 
-		for ii in range(P_cls.shape[1]):
+		for ii in range(int(P_cls.shape[1])):
 
-			if np.max(P_cls[0, ii, :]) < bbox_threshold or np.argmax(P_cls[0, ii, :]) == (P_cls.shape[2] - 1):
-				continue
+			# if np.max(P_cls[0, ii, :]) < bbox_threshold or np.argmax(P_cls[0, ii, :]) == (P_cls.shape[2] - 1):
+			# 	continue
 
 			cls_name = class_mapping[np.argmax(P_cls[0, ii, :])]
+			print("Class name test:", cls_name)
 
 			if cls_name not in bboxes:
 				bboxes[cls_name] = []
@@ -219,6 +226,8 @@ for idx, img_name in enumerate(sorted(os.listdir(img_path))):
 
 	all_dets = []
 
+	# Does not execute this code, as bboxes variable is always empty
+	print("Testing the output implementation for bounding boxes:", bboxes)
 	for key in bboxes:
 		bbox = np.array(bboxes[key])
 
