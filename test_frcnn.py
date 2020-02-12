@@ -149,7 +149,7 @@ all_imgs = []
 
 classes = {}
 
-bbox_threshold = 0.8
+bbox_threshold = 0.4
 
 visualise = True
 
@@ -199,8 +199,8 @@ for idx, img_name in enumerate(sorted(os.listdir(img_path))):
 
 		for ii in range(int(P_cls.shape[1])):
 
-			# if np.max(P_cls[0, ii, :]) < bbox_threshold or np.argmax(P_cls[0, ii, :]) == (P_cls.shape[2] - 1):
-			# 	continue
+			if np.max(P_cls[0, ii, :]) < bbox_threshold or np.argmax(P_cls[0, ii, :]) == (P_cls.shape[2] - 1):
+				continue
 
 			cls_name = class_mapping[np.argmax(P_cls[0, ii, :])]
 			print("Class name test:", cls_name)
